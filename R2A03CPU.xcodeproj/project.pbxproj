@@ -1,0 +1,298 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		85C53182197301BB00A8230B /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85C53181197301BB00A8230B /* CoreFoundation.framework */; };
+		85C53188197301BB00A8230B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 85C53186197301BB00A8230B /* InfoPlist.strings */; };
+		85C531A5197302BA00A8230B /* R2A03CPU.m in Sources */ = {isa = PBXBuildFile; fileRef = 85C531A4197302BA00A8230B /* R2A03CPU.m */; };
+		85C531A8197305C600A8230B /* R2A03Ctx.m in Sources */ = {isa = PBXBuildFile; fileRef = 85C531A7197305C600A8230B /* R2A03Ctx.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		85C5317E197301BB00A8230B /* R2A03CPU.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = R2A03CPU.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		85C53181197301BB00A8230B /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		85C53185197301BB00A8230B /* R2A03CPU-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "R2A03CPU-Info.plist"; sourceTree = "<group>"; };
+		85C53187197301BB00A8230B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		85C53189197301BB00A8230B /* R2A03CPU-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "R2A03CPU-Prefix.pch"; sourceTree = "<group>"; };
+		85C531A3197302BA00A8230B /* R2A03CPU.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = R2A03CPU.h; sourceTree = "<group>"; };
+		85C531A4197302BA00A8230B /* R2A03CPU.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = R2A03CPU.m; sourceTree = "<group>"; };
+		85C531A6197305C600A8230B /* R2A03Ctx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = R2A03Ctx.h; sourceTree = "<group>"; };
+		85C531A7197305C600A8230B /* R2A03Ctx.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = R2A03Ctx.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		85C5317B197301BB00A8230B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85C53182197301BB00A8230B /* CoreFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		85C53175197301BB00A8230B = {
+			isa = PBXGroup;
+			children = (
+				85C53183197301BB00A8230B /* R2A03CPU */,
+				85C53180197301BB00A8230B /* Frameworks */,
+				85C5317F197301BB00A8230B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		85C5317F197301BB00A8230B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				85C5317E197301BB00A8230B /* R2A03CPU.bundle */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		85C53180197301BB00A8230B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				85C53181197301BB00A8230B /* CoreFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		85C53183197301BB00A8230B /* R2A03CPU */ = {
+			isa = PBXGroup;
+			children = (
+				85C53184197301BB00A8230B /* Supporting Files */,
+				85C531A3197302BA00A8230B /* R2A03CPU.h */,
+				85C531A4197302BA00A8230B /* R2A03CPU.m */,
+				85C531A6197305C600A8230B /* R2A03Ctx.h */,
+				85C531A7197305C600A8230B /* R2A03Ctx.m */,
+			);
+			path = R2A03CPU;
+			sourceTree = "<group>";
+		};
+		85C53184197301BB00A8230B /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				85C53185197301BB00A8230B /* R2A03CPU-Info.plist */,
+				85C53186197301BB00A8230B /* InfoPlist.strings */,
+				85C53189197301BB00A8230B /* R2A03CPU-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		85C5317D197301BB00A8230B /* R2A03CPU */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85C5318C197301BB00A8230B /* Build configuration list for PBXNativeTarget "R2A03CPU" */;
+			buildPhases = (
+				85C5317A197301BB00A8230B /* Sources */,
+				85C5317B197301BB00A8230B /* Frameworks */,
+				85C5317C197301BB00A8230B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = R2A03CPU;
+			productName = R2A03CPU;
+			productReference = 85C5317E197301BB00A8230B /* R2A03CPU.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		85C53176197301BB00A8230B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Benjamin Charron";
+			};
+			buildConfigurationList = 85C53179197301BB00A8230B /* Build configuration list for PBXProject "R2A03CPU" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 85C53175197301BB00A8230B;
+			productRefGroup = 85C5317F197301BB00A8230B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				85C5317D197301BB00A8230B /* R2A03CPU */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		85C5317C197301BB00A8230B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85C53188197301BB00A8230B /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		85C5317A197301BB00A8230B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85C531A8197305C600A8230B /* R2A03Ctx.m in Sources */,
+				85C531A5197302BA00A8230B /* R2A03CPU.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		85C53186197301BB00A8230B /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				85C53187197301BB00A8230B /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		85C5318A197301BB00A8230B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		85C5318B197301BB00A8230B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		85C5318D197301BB00A8230B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "R2A03CPU/R2A03CPU-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"/Users/bcharron/re/hopper-r2a03-cpu/include",
+				);
+				INFOPLIST_FILE = "R2A03CPU/R2A03CPU-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		85C5318E197301BB00A8230B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "R2A03CPU/R2A03CPU-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"/Users/bcharron/re/hopper-r2a03-cpu/include",
+				);
+				INFOPLIST_FILE = "R2A03CPU/R2A03CPU-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		85C53179197301BB00A8230B /* Build configuration list for PBXProject "R2A03CPU" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85C5318A197301BB00A8230B /* Debug */,
+				85C5318B197301BB00A8230B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85C5318C197301BB00A8230B /* Build configuration list for PBXNativeTarget "R2A03CPU" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85C5318D197301BB00A8230B /* Debug */,
+				85C5318E197301BB00A8230B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 85C53176197301BB00A8230B /* Project object */;
+}
