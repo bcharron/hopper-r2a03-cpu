@@ -107,7 +107,7 @@ struct r2a3_inst R2A03_INSTRUCTIONS[] = {
 /* 0x69 */ { "ADC", 0x69, FALSE, AM_IMMEDIATE, 2 },
 /* 0x6A */ { "ROR", 0x6A, FALSE, AM_ACCUMULATOR, 1 },
 /* 0x6B */ { "BAD", 0x6B, TRUE, AM_IMPLIED, 1 },
-/* 0x6C */ { "BAD", 0x6C, TRUE, AM_IMPLIED, 1 },
+/* 0x6C */ { "JMP", 0x6C, FALSE, AM_INDIRECT, 3 },
 /* 0x6D */ { "ADC", 0x6D, FALSE, AM_ABSOLUTE, 3 },
 /* 0x6E */ { "ROR", 0x6E, FALSE, AM_ABSOLUTE, 3 },
 /* 0x6F */ { "BAD", 0x6F, TRUE, AM_IMPLIED, 1 },
