@@ -168,7 +168,7 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
         return(DISASM_UNKNOWN_OPCODE);
     }
     
-    strcpy(disasm->operand1.mnemonic, R2A03_INSTRUCTIONS[opcode].mnemonic);
+    strcpy(disasm->instruction.mnemonic, R2A03_INSTRUCTIONS[opcode].mnemonic);
     
     char addressing[20];
     
@@ -177,23 +177,38 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
             snprintf(addressing, sizeof(addressing), "$%02X", disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
+            
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%02X", disasm->bytes[1]);
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
             break;
 
         case AM_ZERO_PAGE_X:
             snprintf(addressing, sizeof(addressing), "$%02X,X", disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
+            
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%02X", disasm->bytes[1]);
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
+
+            strcpy(disasm->operand2.mnemonic, ",X");
+            disasm->operand2.type = DISASM_OPERAND_REGISTER_TYPE;
             break;
 
         case AM_IMMEDIATE:
             snprintf(addressing, sizeof(addressing), "#$%02X", disasm->bytes[1]);
             disasm->operand1.immediatValue = disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE;
+            
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "#$%02X", disasm->bytes[1]);
+            disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE;
             break;
             
         case AM_ABSOLUTE:
             snprintf(addressing, sizeof(addressing), "$%04X", disasm->bytes[2] << 8 | disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_MEMORY_TYPE;
+            
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", disasm->bytes[2] << 8 | disasm->bytes[1]);
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
             break;
             
@@ -202,24 +217,45 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
             snprintf(addressing, sizeof(addressing), "$%04X,X", disasm->bytes[2] << 8 | disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+            
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", disasm->bytes[2] << 8 | disasm->bytes[1]);
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
+
+            strcpy(disasm->operand2.mnemonic, ",X");
+            disasm->operand2.type = DISASM_OPERAND_REGISTER_TYPE;
             break;
 
         case AM_ABSOLUTE_Y:
             snprintf(addressing, sizeof(addressing), "$%04X,Y", disasm->bytes[2] << 8 | disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+            
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", disasm->bytes[2] << 8 | disasm->bytes[1]);
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
+            
+            strcpy(disasm->operand2.mnemonic, ",Y");
+            disasm->operand2.type = DISASM_OPERAND_REGISTER_TYPE;
             break;
 
         case AM_INDIRECT_X:
             snprintf(addressing, sizeof(addressing), "($%02X,X)", disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+            
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%02X,X)", disasm->bytes[1]);
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
             break;
 
         case AM_INDIRECT_Y:
             snprintf(addressing, sizeof(addressing), "($%02X),Y", disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+            
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%02X)", disasm->bytes[1]);
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
+            
+            strcpy(disasm->operand2.mnemonic, ",Y");
+            disasm->operand2.type = DISASM_OPERAND_REGISTER_TYPE;
             break;
 
         case AM_IMPLIED:
@@ -230,6 +266,8 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
         case AM_ACCUMULATOR:
             strcpy(addressing, "A");
             disasm->operand1.type = DISASM_OPERAND_REGISTER_TYPE;
+            
+            strcpy(disasm->operand1.mnemonic, "A");
             break;
 
         default:
@@ -286,6 +324,8 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
         disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
         
         snprintf(addressing, sizeof(addressing), "$%04X", (uint16_t) disasm->instruction.addressValue);
+        
+        snprintf(disasm->operand1.mnemonic, sizeof(addressing), "$%04X", (uint16_t) disasm->instruction.addressValue);
     }
     
     // XXX: How to indicate that PHA and PLA are stack instructions?
@@ -316,98 +356,13 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
         default:
             break;
     }
-    
+
+    // Default value?
+    /*
     snprintf(disasm->completeInstructionString, DISASM_INSTRUCTION_MAX_LENGTH, "%s %s", R2A03_INSTRUCTIONS[opcode].mnemonic, addressing);
+    */
     
     return(R2A03_INSTRUCTIONS[opcode].len);
-    
-    // In this early version, only branch instructions are analyzed in order to correctly
-    // construct basic blocks of procedures.
-    //
-    // This is the strict minimum!
-    //
-    // You should also fill the "operand" description for every other instruction to take
-    // advantage of the various analysis of Hopper.
-    /*
-    if (d.status & (DESA68_BSR | DESA68_BRA)) {
-        if (strncmp(disasm->instruction.mnemonic, "jsr", 3) == 0
-            || strncmp(disasm->instruction.mnemonic, "bsr", 3) == 0) {
-            disasm->instruction.branchType = DISASM_BRANCH_CALL;
-            if (d.branch & d.memmsk) {
-                disasm->instruction.addressValue = d.branch & d.memmsk;
-                disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
-                disasm->operand1.immediatValue = disasm->instruction.addressValue;
-            }
-        }
-        else {
-            if (disasm->instruction.mnemonic[0] == 'd') {
-                disasm->instruction.branchType = DISASM_BRANCH_JNE;
-                if (d.branch & d.memmsk) {
-                    disasm->instruction.addressValue = d.branch & d.memmsk;
-                    disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
-                    disasm->operand1.immediatValue = disasm->instruction.addressValue;
-                }
-            }
-            else {
-                if (strncmp(disasm->instruction.mnemonic, "bra", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JMP;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "bhi", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JA;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "bls", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JB;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "bcc", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JNC;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "bcs", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JC;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "bne", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JNE;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "beq", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JE;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "bvc", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JNO;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "bvs", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JO;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "bpl", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JA;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "bmi", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JB;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "bge", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JNL;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "blt", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JL;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "bgt", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JG;
-                }
-                if (strncmp(disasm->instruction.mnemonic, "ble", 3) == 0) {
-                    disasm->instruction.branchType = DISASM_BRANCH_JNG;
-                }
-            }
-        }
-        if (d.branch & d.memmsk) {
-            disasm->instruction.addressValue = d.branch & d.memmsk;
-            disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
-            disasm->operand1.immediatValue = disasm->instruction.addressValue;
-        }
-    }
-    
-    if (d.status & DESA68_RTS) disasm->instruction.branchType = DISASM_BRANCH_RET;
-    
-    int len = d.pc - (unsigned int) disasm->virtualAddr;
-    return len;
-     */
 }
 
 /// Returns whether or not an instruction may halt the processor (like the HLT Intel instruction).
@@ -458,16 +413,20 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
 /// Build the complete instruction string in the DisasmStruct structure.
 /// This is the string to be displayed in Hopper.
 - (void)buildInstructionString:(DisasmStruct *)disasm forSegment:(NSObject<HPSegment> *)segment populatingInfo:(NSObject<HPFormattedInstructionInfo> *)formattedInstructionInfo {
-    /*
-    const char *spaces = "                ";
+    
+    const char *spaces = "       ";
     strcpy(disasm->completeInstructionString, disasm->instruction.mnemonic);
     strcat(disasm->completeInstructionString, spaces + strlen(disasm->instruction.mnemonic));
     for (int i=0; i<DISASM_MAX_OPERANDS; i++) {
-        if (disasm->operand[i].mnemonic[0] == 0) break;
-        if (i) strcat(disasm->completeInstructionString, ", ");
+        if (disasm->operand[i].type == DISASM_OPERAND_NO_OPERAND) break;
+        if (i) strcat(disasm->completeInstructionString, " ");
+        
+        if (disasm->operand[i].type == DISASM_OPERAND_ABSOLUTE) {
+            // Find the variable name here. Shouldn't Hopper do that?
+//            [formattedInstructionInfo ]
+        }
         strcat(disasm->completeInstructionString, disasm->operand[i].mnemonic);
     }
-    */
 }
 
 // Decompiler

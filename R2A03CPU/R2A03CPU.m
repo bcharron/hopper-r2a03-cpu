@@ -168,13 +168,10 @@
                    return (c == '#' || c == '$');
                }
            languageWordPredicate:^BOOL(NSString *s) {
-               return [s isEqualToString:@"d0"] || [s isEqualToString:@"d1"] || [s isEqualToString:@"d2"] || [s isEqualToString:@"d3"]
-               || [s isEqualToString:@"d4"] || [s isEqualToString:@"d5"] || [s isEqualToString:@"d6"] || [s isEqualToString:@"d7"]
-               || [s isEqualToString:@"a0"] || [s isEqualToString:@"a1"] || [s isEqualToString:@"a2"] || [s isEqualToString:@"a3"]
-               || [s isEqualToString:@"a4"] || [s isEqualToString:@"a5"] || [s isEqualToString:@"a6"] || [s isEqualToString:@"a7"];
+               return(NO);
            }
         subLanguageWordPredicate:^BOOL(NSString *s) {
-            return NO;
+            return(NO);
         }];
     return colorized;
 }
