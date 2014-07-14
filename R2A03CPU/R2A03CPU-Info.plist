@@ -40,6 +40,8 @@
 	</dict>
 	<key>CFPlugInUnloadFunction</key>
 	<string></string>
+	<key>NSPrincipalClass</key>
+	<string>R2A03CPU</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2014 Benjamin Charron. All rights reserved.</string>
 </dict>

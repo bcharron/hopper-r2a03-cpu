@@ -58,14 +58,14 @@
 /// Returns an array of NSString of CPU subfamilies handled by the plugin for a given CPU family.
 - (NSArray *)cpuSubFamiliesForFamily:(NSString *)family {
     if ([family isEqualToString:@"ricoh"])
-        return(@[@"r2A3"]);
+        return(@[@"R2A3"]);
     
     return(nil);
 }
 
 /// Returns 32 or 64, according to the family and subFamily arguments.
 - (int)addressSpaceWidthInBitsForCPUFamily:(NSString *)family andSubFamily:(NSString *)subFamily {
-    if ([family isEqualToString:@"ricoh"] && [subFamily isEqualToString:@"r2A3"]) return 32;
+    if ([family isEqualToString:@"ricoh"] && [subFamily isEqualToString:@"R2A3"]) return 32;
     return(0);
 }
 
@@ -100,19 +100,53 @@
     switch (reg_class) {
         case RegClass_CPUState: return 1;
         case RegClass_PseudoRegisterSTACK: return 32;
-        case RegClass_GeneralPurposeRegister: return 8;
-        case RegClass_AddressRegister: return 8;
+        case RegClass_GeneralPurposeRegister: return 4;
+        case RegClass_AddressRegister: return 3;
         default: break;
     }
     return 0;
 }
 
+// Not quite sure what this function should return for GP and Address registers
 - (NSString *)registerIndexToString:(int)reg ofClass:(RegClass)reg_class withBitSize:(int)size andPosition:(DisasmPosition)position {
     switch (reg_class) {
         case RegClass_CPUState: return @"CCR";
         case RegClass_PseudoRegisterSTACK: return [NSString stringWithFormat:@"STK%d", reg];
-        case RegClass_GeneralPurposeRegister: return [NSString stringWithFormat:@"d%d", reg];
-        case RegClass_AddressRegister: return [NSString stringWithFormat:@"a%d", reg];
+        case RegClass_GeneralPurposeRegister: {
+            switch(reg) {
+                case 0x00: return @"A";
+                    break;
+                    
+                case 0x01: return @"X";
+                    break;
+                    
+                case 0x02: return @"Y";
+                    break;
+                    
+                case 0x03: return(@"SP");
+                    break;
+                    
+                default:
+                    return(@"NA");
+                    break;
+            }
+        }
+        case RegClass_AddressRegister: {
+            switch(reg) {
+                case 0x00:
+                    return(@"X");
+                    break;
+                    
+                case 0x01:
+                    return(@"Y");
+                    break;
+                    
+                default:
+                    return(@"NA");
+                    break;
+            }
+        }
+            
         default: break;
     }
     

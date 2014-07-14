@@ -11,10 +11,24 @@
 		85C53188197301BB00A8230B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 85C53186197301BB00A8230B /* InfoPlist.strings */; };
 		85C531A5197302BA00A8230B /* R2A03CPU.m in Sources */ = {isa = PBXBuildFile; fileRef = 85C531A4197302BA00A8230B /* R2A03CPU.m */; };
 		85C531A8197305C600A8230B /* R2A03Ctx.m in Sources */ = {isa = PBXBuildFile; fileRef = 85C531A7197305C600A8230B /* R2A03Ctx.m */; };
+		85C531AC197328AF00A8230B /* R2A03CPU.hopperCPU in CopyFiles */ = {isa = PBXBuildFile; fileRef = 85C5317E197301BB00A8230B /* R2A03CPU.hopperCPU */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		85C531AB197328A900A8230B /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "/Users/bcharron/Library/Application Support/Hopper/PlugIns/CPUs";
+			dstSubfolderSpec = 0;
+			files = (
+				85C531AC197328AF00A8230B /* R2A03CPU.hopperCPU in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		85C5317E197301BB00A8230B /* R2A03CPU.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = R2A03CPU.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		85C5317E197301BB00A8230B /* R2A03CPU.hopperCPU */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = R2A03CPU.hopperCPU; sourceTree = BUILT_PRODUCTS_DIR; };
 		85C53181197301BB00A8230B /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		85C53185197301BB00A8230B /* R2A03CPU-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "R2A03CPU-Info.plist"; sourceTree = "<group>"; };
 		85C53187197301BB00A8230B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -23,6 +37,7 @@
 		85C531A4197302BA00A8230B /* R2A03CPU.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = R2A03CPU.m; sourceTree = "<group>"; };
 		85C531A6197305C600A8230B /* R2A03Ctx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = R2A03Ctx.h; sourceTree = "<group>"; };
 		85C531A7197305C600A8230B /* R2A03Ctx.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = R2A03Ctx.m; sourceTree = "<group>"; };
+		85C531AF197334E400A8230B /* opcodes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = opcodes.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,7 +64,7 @@
 		85C5317F197301BB00A8230B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				85C5317E197301BB00A8230B /* R2A03CPU.bundle */,
+				85C5317E197301BB00A8230B /* R2A03CPU.hopperCPU */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +85,7 @@
 				85C531A4197302BA00A8230B /* R2A03CPU.m */,
 				85C531A6197305C600A8230B /* R2A03Ctx.h */,
 				85C531A7197305C600A8230B /* R2A03Ctx.m */,
+				85C531AF197334E400A8230B /* opcodes.h */,
 			);
 			path = R2A03CPU;
 			sourceTree = "<group>";
@@ -94,6 +110,7 @@
 				85C5317A197301BB00A8230B /* Sources */,
 				85C5317B197301BB00A8230B /* Frameworks */,
 				85C5317C197301BB00A8230B /* Resources */,
+				85C531AB197328A900A8230B /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -101,7 +118,7 @@
 			);
 			name = R2A03CPU;
 			productName = R2A03CPU;
-			productReference = 85C5317E197301BB00A8230B /* R2A03CPU.bundle */;
+			productReference = 85C5317E197301BB00A8230B /* R2A03CPU.hopperCPU */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -239,6 +256,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "R2A03CPU/R2A03CPU-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -247,9 +265,9 @@
 					"/Users/bcharron/re/hopper-r2a03-cpu/include",
 				);
 				INFOPLIST_FILE = "R2A03CPU/R2A03CPU-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				INSTALL_PATH = "$HOME/Library/Application\\ Support/Hopper/PlugIns/CPUs";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = bundle;
+				WRAPPER_EXTENSION = hopperCPU;
 			};
 			name = Debug;
 		};
@@ -257,6 +275,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "R2A03CPU/R2A03CPU-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -265,9 +284,9 @@
 					"/Users/bcharron/re/hopper-r2a03-cpu/include",
 				);
 				INFOPLIST_FILE = "R2A03CPU/R2A03CPU-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				INSTALL_PATH = "$HOME/Library/Application\\ Support/Hopper/PlugIns/CPUs";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = bundle;
+				WRAPPER_EXTENSION = hopperCPU;
 			};
 			name = Release;
 		};

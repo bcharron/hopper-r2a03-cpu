@@ -9,6 +9,30 @@
 #import "R2A03Ctx.h"
 #import "R2A03CPU.h"
 
+enum r2a3_addressing_modes {
+    AM_IMPLIED,
+    AM_ACCUMULATOR,
+    AM_IMMEDIATE,
+    AM_ZERO_PAGE,
+    AM_ZERO_PAGE_X,
+    AM_ABSOLUTE,
+    AM_ABSOLUTE_X,
+    AM_ABSOLUTE_Y,
+    AM_INDIRECT_X,
+    AM_INDIRECT_Y
+};
+
+struct r2a3_inst {
+    char mnemonic[4];
+    uint8_t number;
+    bool isBranch;
+    enum r2a3_addressing_modes addr_mode;
+    uint8_t len;
+};
+
+// Opcodes table defined here
+#include "opcodes.h"
+
 @implementation R2A03Ctx {
     R2A03CPU *_cpu;
     NSObject<HPDisassembledFile> *_file;
@@ -133,68 +157,169 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
     
     disasm->instruction.branchType = DISASM_BRANCH_NONE;
     disasm->instruction.addressValue = 0;
-
-    /*
-    DESA68parm_t d;
-    d.mem_callb = memory_read_callback;
-    d.private_data = (__bridge void *)self;
-    d.pc = (unsigned int) disasm->virtualAddr;
-    d.memmsk = 0xFFFFFF; // 24 bits addressing
-    d.flags = 0;
-    d.str = instr;
-    d.strmax = sizeof(instr);
-    desa68(&d);
-    */
-    
-    // if ((d.status & DESA68_INST) == 0) return DISASM_UNKNOWN_OPCODE;
     
     for (int i=0; i<DISASM_MAX_OPERANDS; i++)
         disasm->operand[i].type = DISASM_OPERAND_NO_OPERAND;
     
-    int len = 1;
-    uint8_t opcode = [_file readUInt8AtVirtualAddress:disasm->virtualAddr];
+    // uint8_t opcode = [_file readUInt8AtVirtualAddress:disasm->virtualAddr];
+    uint8_t opcode = disasm->bytes[0];
     
+    if (strcmp(R2A03_INSTRUCTIONS[opcode].mnemonic, "BAD") == 0) {
+        return(DISASM_UNKNOWN_OPCODE);
+    }
+    
+    strcpy(disasm->operand1.mnemonic, R2A03_INSTRUCTIONS[opcode].mnemonic);
+    
+    char addressing[20];
+    
+    switch(R2A03_INSTRUCTIONS[opcode].addr_mode) {
+        case AM_ZERO_PAGE:
+            snprintf(addressing, sizeof(addressing), "$%02X", disasm->bytes[1]);
+            disasm->instruction.addressValue = disasm->bytes[1];
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
+            break;
+
+        case AM_ZERO_PAGE_X:
+            snprintf(addressing, sizeof(addressing), "$%02X,X", disasm->bytes[1]);
+            disasm->instruction.addressValue = disasm->bytes[1];
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
+            break;
+
+        case AM_IMMEDIATE:
+            snprintf(addressing, sizeof(addressing), "#$%02X", disasm->bytes[1]);
+            disasm->operand1.immediatValue = disasm->bytes[1];
+            disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE;
+            break;
+            
+        case AM_ABSOLUTE:
+            snprintf(addressing, sizeof(addressing), "$%04X", disasm->bytes[2] << 8 | disasm->bytes[1]);
+            disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
+            break;
+            
+        // Not sure about REGISTER_TYPE
+        case AM_ABSOLUTE_X:
+            snprintf(addressing, sizeof(addressing), "$%04X,X", disasm->bytes[2] << 8 | disasm->bytes[1]);
+            disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+            break;
+
+        case AM_ABSOLUTE_Y:
+            snprintf(addressing, sizeof(addressing), "$%04X,Y", disasm->bytes[2] << 8 | disasm->bytes[1]);
+            disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+            break;
+
+        case AM_INDIRECT_X:
+            snprintf(addressing, sizeof(addressing), "($%02X,X)", disasm->bytes[1]);
+            disasm->instruction.addressValue = disasm->bytes[1];
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+            break;
+
+        case AM_INDIRECT_Y:
+            snprintf(addressing, sizeof(addressing), "($%02X),Y", disasm->bytes[1]);
+            disasm->instruction.addressValue = disasm->bytes[1];
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+            break;
+
+        case AM_IMPLIED:
+            strcpy(addressing, "");
+            disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE;
+            break;
+
+        case AM_ACCUMULATOR:
+            strcpy(addressing, "A");
+            disasm->operand1.type = DISASM_OPERAND_REGISTER_TYPE;
+            break;
+
+        default:
+            snprintf(addressing, sizeof(addressing), "XXXXXX");
+            disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE;
+            break;
+    }
+
+    if (R2A03_INSTRUCTIONS[opcode].isBranch) {
+        switch(opcode) {
+            case 0x10: // BPL
+                disasm->instruction.branchType = DISASM_BRANCH_JNS;
+                break;
+                
+            case 030: // BMI
+                disasm->instruction.branchType = DISASM_BRANCH_JS;
+                break;
+                
+            case 0x50: // BVC
+                disasm->instruction.branchType = DISASM_BRANCH_JNO;
+                break;
+                
+            case 0x70: // BVS
+                disasm->instruction.branchType = DISASM_BRANCH_JO;
+                break;
+                
+            case 0x90: // BCC
+                disasm->instruction.branchType = DISASM_BRANCH_JNC;
+                break;
+                
+            case 0xB0: // BCS
+                disasm->instruction.branchType = DISASM_BRANCH_JC;
+                break;
+                
+            case 0xD0: // BNE
+                disasm->instruction.branchType = DISASM_BRANCH_JNE;
+                break;
+                
+            case 0xF0: // BEQ
+                disasm->instruction.branchType = DISASM_BRANCH_JE;
+                break;
+                
+            default:
+                disasm->instruction.branchType = DISASM_BRANCH_JNE;
+                break;
+        }
+        
+        // uint8_t l = [_file readUInt8AtVirtualAddress:disasm->virtualAddr + 1];
+        // uint8_t h = [_file readUInt8AtVirtualAddress:disasm->virtualAddr + 2];
+        
+        // Branches are relative. PC already read both the opcode and the operand, hence +2
+        disasm->instruction.addressValue = disasm->virtualAddr + (int8_t) disasm->bytes[1] + 2;
+        disasm->operand1.immediatValue = disasm->instruction.addressValue;
+        disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
+        
+        snprintf(addressing, sizeof(addressing), "$%04X", (uint16_t) disasm->instruction.addressValue);
+    }
+    
+    // XXX: How to indicate that PHA and PLA are stack instructions?
+    
+    // Special instructions
     switch(opcode) {
-        case 0x60:
-            strcpy(disasm->operand1.mnemonic, "RTS");
-            strcpy(disasm->completeInstructionString, "RTS");
+        case 0x60: // RTS
             disasm->instruction.branchType = DISASM_BRANCH_RET;
             break;
             
-        case 0x10:
-            strcpy(disasm->operand1.mnemonic, "BCC");
-
-            disasm->instruction.branchType = DISASM_BRANCH_JC;
-            disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_ABSOLUTE;
-            
-            uint8_t l = [_file readUInt8AtVirtualAddress:disasm->virtualAddr + 1];
-            uint8_t h = [_file readUInt8AtVirtualAddress:disasm->virtualAddr + 2];
-            
-            disasm->instruction.addressValue = (h << 8) | l;
-            disasm->operand1.immediatValue = disasm->instruction.addressValue;
-
-            snprintf(disasm->completeInstructionString, DISASM_INSTRUCTION_MAX_LENGTH, "BCC $%04X", (uint16_t) disasm->instruction.addressValue);
-            
-            len += 2;
+        case 0x20: // JSR
+            disasm->instruction.branchType = DISASM_BRANCH_CALL;
             break;
             
-        case 0xA9:
-            strcpy(disasm->operand1.mnemonic, "LDA");
-            disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE;
+        case 0x4C: // JMP (absolute)
+        case 0x6c: // JMP (indirect)
+            disasm->instruction.branchType = DISASM_BRANCH_JMP;
+            break;
             
-            uint8_t imm = [_file readUInt8AtVirtualAddress:disasm->virtualAddr + 1];
-            disasm->operand1.immediatValue = imm;
+        case 0x40: // RTI
+            disasm->instruction.branchType = DISASM_BRANCH_RET;
+            break;
             
-            snprintf(disasm->completeInstructionString, DISASM_INSTRUCTION_MAX_LENGTH, "LDA #$%02X", imm);
-
-            len += 1;
+        case 0x18: // CLC
+            disasm->instruction.eflags.CF_flag = 0;
+            break;
             
         default:
-            strcpy(disasm->operand1.mnemonic, "UNK");
             break;
     }
     
-    return(len);
+    snprintf(disasm->completeInstructionString, DISASM_INSTRUCTION_MAX_LENGTH, "%s %s", R2A03_INSTRUCTIONS[opcode].mnemonic, addressing);
+    
+    return(R2A03_INSTRUCTIONS[opcode].len);
     
     // In this early version, only branch instructions are analyzed in order to correctly
     // construct basic blocks of procedures.
