@@ -18,6 +18,7 @@ enum r2a3_addressing_modes {
     AM_ABSOLUTE,
     AM_ABSOLUTE_X,
     AM_ABSOLUTE_Y,
+    AM_INDIRECT,
     AM_INDIRECT_X,
     AM_INDIRECT_Y
 };
@@ -31,6 +32,7 @@ struct r2a3_inst {
 };
 
 // Opcodes table defined here
+// Really should be a C file instead..
 #include "opcodes.h"
 
 @implementation R2A03Ctx {
@@ -93,7 +95,7 @@ struct r2a3_inst {
     return(FALSE);
 }
 
-/// Notify the plugin that an analysisbegan from an entry point.
+/// Notify the plugin that an analysis bgan from an entry point.
 /// This could be either a simple disassembling, or a procedure creation.
 /// In the latter case, another method will be called to notify the plugin (see below).
 - (void)analysisBeginsAt:(Address)entryPoint {
@@ -133,23 +135,6 @@ struct r2a3_inst {
     
 }
 
-/*
-- (uint8_t)estimateCPUModeAtVirtualAddress:(Address)address {
-    return 0;
-}
-*/
-
-/*
-uint16_t memory_read_callback(uint32_t address, void* private) {
-    M68kCtx *ctx = (__bridge M68kCtx *)private;
-    return [ctx readWordAt:address];
-}
-
-- (uint16_t)readWordAt:(uint32_t)address {
-    return [_file readUInt16AtVirtualAddress:address];
-}
- */
-
 /// Disassemble a single instruction, filling the DisasmStruct structure.
 /// Only a few fields are set by Hopper (mainly, the syntaxIndex, the "bytes" field and the virtualAddress of the instruction).
 /// The CPU should fill as much information as possible.
@@ -161,7 +146,6 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
     for (int i=0; i<DISASM_MAX_OPERANDS; i++)
         disasm->operand[i].type = DISASM_OPERAND_NO_OPERAND;
     
-    // uint8_t opcode = [_file readUInt8AtVirtualAddress:disasm->virtualAddr];
     uint8_t opcode = disasm->bytes[0];
     
     if (strcmp(R2A03_INSTRUCTIONS[opcode].mnemonic, "BAD") == 0) {
@@ -174,104 +158,90 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
     
     switch(R2A03_INSTRUCTIONS[opcode].addr_mode) {
         case AM_ZERO_PAGE:
-            snprintf(addressing, sizeof(addressing), "$%02X", disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
-            
             snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%02X", disasm->bytes[1]);
-            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
             break;
 
         case AM_ZERO_PAGE_X:
-            snprintf(addressing, sizeof(addressing), "$%02X,X", disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
-            
             snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%02X", disasm->bytes[1]);
-            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
 
-            strcpy(disasm->operand2.mnemonic, ",X");
+            strcpy(disasm->operand2.mnemonic, "X");
             disasm->operand2.type = DISASM_OPERAND_REGISTER_TYPE;
             break;
 
         case AM_IMMEDIATE:
-            snprintf(addressing, sizeof(addressing), "#$%02X", disasm->bytes[1]);
             disasm->operand1.immediatValue = disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE;
             
             snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "#$%02X", disasm->bytes[1]);
-            disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE;
             break;
             
         case AM_ABSOLUTE:
-            snprintf(addressing, sizeof(addressing), "$%04X", disasm->bytes[2] << 8 | disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
-            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_MEMORY_TYPE;
-            
-            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", disasm->bytes[2] << 8 | disasm->bytes[1]);
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
+            
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
             break;
             
-        // Not sure about REGISTER_TYPE
         case AM_ABSOLUTE_X:
-            snprintf(addressing, sizeof(addressing), "$%04X,X", disasm->bytes[2] << 8 | disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
-            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
             
-            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", disasm->bytes[2] << 8 | disasm->bytes[1]);
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
+            
+            // XXX: size = 1 would be the case for LDA $1234,X, but not every Absolute,X
+            disasm->operand1.size = 8;
 
-            strcpy(disasm->operand2.mnemonic, ",X");
+            strcpy(disasm->operand2.mnemonic, "X");
             disasm->operand2.type = DISASM_OPERAND_REGISTER_TYPE;
             break;
 
         case AM_ABSOLUTE_Y:
-            snprintf(addressing, sizeof(addressing), "$%04X,Y", disasm->bytes[2] << 8 | disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
-            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
             
-            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", disasm->bytes[2] << 8 | disasm->bytes[1]);
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
             
-            strcpy(disasm->operand2.mnemonic, ",Y");
+            strcpy(disasm->operand2.mnemonic, "Y");
             disasm->operand2.type = DISASM_OPERAND_REGISTER_TYPE;
             break;
 
+        case AM_INDIRECT:
+            // We don't know where the jump actually goes, since it's reading from somewhere else. That somewhere else
+            // is very likely to be in RAM.
+            // disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
+            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%04X)", disasm->bytes[2] << 8 | disasm->bytes[1]);
+            break;
+
         case AM_INDIRECT_X:
-            snprintf(addressing, sizeof(addressing), "($%02X,X)", disasm->bytes[1]);
             disasm->instruction.addressValue = disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
-            
             snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%02X,X)", disasm->bytes[1]);
-            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
             break;
 
         case AM_INDIRECT_Y:
-            snprintf(addressing, sizeof(addressing), "($%02X),Y", disasm->bytes[1]);
-            disasm->instruction.addressValue = disasm->bytes[1];
-            disasm->operand1.type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
-            
             snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%02X)", disasm->bytes[1]);
+            disasm->instruction.addressValue = disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
             
-            strcpy(disasm->operand2.mnemonic, ",Y");
+            strcpy(disasm->operand2.mnemonic, "Y");
             disasm->operand2.type = DISASM_OPERAND_REGISTER_TYPE;
             break;
 
         case AM_IMPLIED:
-            strcpy(addressing, "");
-            disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE;
+            disasm->operand1.type = DISASM_OPERAND_NO_OPERAND;
             break;
 
         case AM_ACCUMULATOR:
-            strcpy(addressing, "A");
             disasm->operand1.type = DISASM_OPERAND_REGISTER_TYPE;
-            
             strcpy(disasm->operand1.mnemonic, "A");
             break;
 
         default:
-            snprintf(addressing, sizeof(addressing), "XXXXXX");
             disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE;
             break;
     }
@@ -315,17 +285,12 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
                 break;
         }
         
-        // uint8_t l = [_file readUInt8AtVirtualAddress:disasm->virtualAddr + 1];
-        // uint8_t h = [_file readUInt8AtVirtualAddress:disasm->virtualAddr + 2];
-        
         // Branches are relative. PC already read both the opcode and the operand, hence +2
         disasm->instruction.addressValue = disasm->virtualAddr + (int8_t) disasm->bytes[1] + 2;
         disasm->operand1.immediatValue = disasm->instruction.addressValue;
         disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
         
-        snprintf(addressing, sizeof(addressing), "$%04X", (uint16_t) disasm->instruction.addressValue);
-        
-        snprintf(disasm->operand1.mnemonic, sizeof(addressing), "$%04X", (uint16_t) disasm->instruction.addressValue);
+        snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
     }
     
     // XXX: How to indicate that PHA and PLA are stack instructions?
@@ -356,11 +321,6 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
         default:
             break;
     }
-
-    // Default value?
-    /*
-    snprintf(disasm->completeInstructionString, DISASM_INSTRUCTION_MAX_LENGTH, "%s %s", R2A03_INSTRUCTIONS[opcode].mnemonic, addressing);
-    */
     
     return(R2A03_INSTRUCTIONS[opcode].len);
 }
@@ -416,10 +376,16 @@ uint16_t memory_read_callback(uint32_t address, void* private) {
     
     const char *spaces = "       ";
     strcpy(disasm->completeInstructionString, disasm->instruction.mnemonic);
-    strcat(disasm->completeInstructionString, spaces + strlen(disasm->instruction.mnemonic));
+    strcat(disasm->completeInstructionString, spaces);
+    
     for (int i=0; i<DISASM_MAX_OPERANDS; i++) {
         if (disasm->operand[i].type == DISASM_OPERAND_NO_OPERAND) break;
-        if (i) strcat(disasm->completeInstructionString, " ");
+        if (i) {
+            if (disasm->operand[i].type == DISASM_OPERAND_REGISTER_TYPE)
+                strcat(disasm->completeInstructionString, ",");
+            else
+                strcat(disasm->completeInstructionString, " ");
+        }
         
         if (disasm->operand[i].type == DISASM_OPERAND_ABSOLUTE) {
             // Find the variable name here. Shouldn't Hopper do that?
