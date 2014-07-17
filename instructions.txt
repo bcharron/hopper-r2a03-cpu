@@ -1,3 +1,5 @@
+This file taken from http://www.6502.org/tutorials/6502opcodes.html
+
 [Return to Main Page] NMOS 6502 Opcodes by John Pickens, Updated by Bruce Clark and by Ed Spittles 
 [Up to Tutorials and Aids] 
 INDEX
