@@ -154,8 +154,6 @@ struct r2a3_inst {
     
     strcpy(disasm->instruction.mnemonic, R2A03_INSTRUCTIONS[opcode].mnemonic);
     
-    char addressing[20];
-    
     switch(R2A03_INSTRUCTIONS[opcode].addr_mode) {
         case AM_ZERO_PAGE:
             disasm->instruction.addressValue = disasm->bytes[1];
@@ -180,14 +178,14 @@ struct r2a3_inst {
             break;
             
         case AM_ABSOLUTE:
-            disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
+            disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
             
             snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
             break;
             
         case AM_ABSOLUTE_X:
-            disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
+            disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
             
             snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
@@ -200,7 +198,7 @@ struct r2a3_inst {
             break;
 
         case AM_ABSOLUTE_Y:
-            disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
+            disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
             
             snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
@@ -214,7 +212,7 @@ struct r2a3_inst {
             // is very likely to be in RAM.
             // disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
             disasm->operand1.type = DISASM_OPERAND_ABSOLUTE;
-            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%04X)", disasm->bytes[2] << 8 | disasm->bytes[1]);
+            snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%04X)", OSReadLittleInt16(disasm->bytes, 0x01));
             break;
 
         case AM_INDIRECT_X:
@@ -373,26 +371,33 @@ struct r2a3_inst {
 /// Build the complete instruction string in the DisasmStruct structure.
 /// This is the string to be displayed in Hopper.
 - (void)buildInstructionString:(DisasmStruct *)disasm forSegment:(NSObject<HPSegment> *)segment populatingInfo:(NSObject<HPFormattedInstructionInfo> *)formattedInstructionInfo {
-    
-    const char *spaces = "       ";
-    strcpy(disasm->completeInstructionString, disasm->instruction.mnemonic);
-    strcat(disasm->completeInstructionString, spaces);
+    NSMutableString *output = [NSMutableString stringWithFormat:@"%-10s", disasm->instruction.mnemonic];
     
     for (int i=0; i<DISASM_MAX_OPERANDS; i++) {
         if (disasm->operand[i].type == DISASM_OPERAND_NO_OPERAND) break;
-        if (i) {
-            if (disasm->operand[i].type == DISASM_OPERAND_REGISTER_TYPE)
-                strcat(disasm->completeInstructionString, ",");
-            else
-                strcat(disasm->completeInstructionString, " ");
+        
+        if (i >= 1) {
+            [output appendString:@", "];
         }
         
-        if (disasm->operand[i].type == DISASM_OPERAND_ABSOLUTE) {
-            // Find the variable name here. Shouldn't Hopper do that?
-//            [formattedInstructionInfo ]
+        NSString *temp = [[NSString alloc] initWithCString:disasm->operand[i].mnemonic encoding:NSUTF8StringEncoding];
+        
+        if (disasm->operand[i].type & ( DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_RELATIVE)) {
+            ArgFormat format = [_file formatForArgument:i atVirtualAddress:disasm->instruction.addressValue];
+            
+            if (format == Format_Address || format == Format_Offset || format == Format_Default) {
+                NSString *name = [_file nameForVirtualAddress:disasm->instruction.addressValue];
+                
+                if (name != NULL) {
+                    temp = name;
+                }
+            }
         }
-        strcat(disasm->completeInstructionString, disasm->operand[i].mnemonic);
+        
+        [output appendString:temp];
     }
+    
+    strncpy(disasm->completeInstructionString, [output cStringUsingEncoding:NSUTF8StringEncoding], DISASM_INSTRUCTION_MAX_LENGTH - 1);
 }
 
 // Decompiler
