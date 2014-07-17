@@ -398,7 +398,9 @@ struct r2a3_inst {
         }
         
         NSString *temp = [[NSString alloc] initWithCString:disasm->operand[i].mnemonic encoding:NSUTF8StringEncoding];
-        
+    
+        // XXX: This does not take into consideration the case of "indirect X" addressing ($1234,X).
+        // The ",X" will be lost in translation. Also drops the parantheses around the other indirect adddressing.
         if (disasm->operand[i].type & ( DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_RELATIVE)) {
             ArgFormat format = [_file formatForArgument:i atVirtualAddress:disasm->instruction.addressValue];
             
